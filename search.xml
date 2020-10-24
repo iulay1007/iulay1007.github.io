@@ -1,6 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>C语言程序的内存分布和指针简介</title>
+    <url>/2020/10/25/C%E8%AF%AD%E8%A8%80%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%86%85%E5%AD%98%E5%88%86%E5%B8%83%E5%92%8C%E6%8C%87%E9%92%88%E7%AE%80%E4%BB%8B/</url>
+    <content><![CDATA[<h1 id="C语言程序的内存分布"><a href="#C语言程序的内存分布" class="headerlink" title="C语言程序的内存分布"></a>C语言程序的内存分布</h1><p><img src="https://i.loli.net/2020/10/23/b1fLa2u3EcBZSMG.jpg" alt="1364115879_7087.jpg"></p>
+<a id="more"></a>
+
+<h2 id="代码区"><a href="#代码区" class="headerlink" title="代码区"></a>代码区</h2><p><em>只读区域，程序运行过程中无法做任何修改的存储区域，用于存放CPU执行的机器指令</em></p>
+<p>通常，代码区是可共享的（即另外的执行程序可以调用它），因为对于频繁被执行的程序，只需要在内存中有一份代码即可。</p>
+<p>代码区通常是<strong>只读</strong>的，使其只读的原因是防止程序意外地修改了它的指令。</p>
+<h2 id="数据区"><a href="#数据区" class="headerlink" title="数据区"></a>数据区</h2><p>包括已初始化的数据段(.data)和未初始化的数据段(.bss)</p>
+<p><strong>已初始化的数据段</strong>：通常简称为数据段，是指用来存放程序中已初始化的全局变量的一块内存区域。数据段属于静态内存分配。数据段中的静态数据区存放的是程序中已初始化的<strong>全局变量、静态变量和常量</strong>。</p>
+<p><strong>未初始化的数据段</strong> ：亦称BSS区，存入的是全局未初始化变量。BSS区的数据在程序开始执行之前被内核初始化为0。</p>
+<h2 id="堆区"><a href="#堆区" class="headerlink" title="堆区"></a>堆区</h2><p>用于动态内存分配。</p>
+<p>当进程调用malloc,calloc,realloc等函数分配内存时，新分配的内存就被动态添加到堆上（堆被扩张）；当利用free 等函数释放内存时，被释放的内存从堆中被剔除（堆被缩减）</p>
+<h2 id="栈区"><a href="#栈区" class="headerlink" title="栈区"></a>栈区</h2><p>由编译器自动分配释放内存的区间，所得的内存空间一般都是连续的，是用来存放函数的参数值、局部变量的值、函数的返回值等。</p>
+<p>在程序运行时由编译器在需要的时候分配，在不需要的时候自动清除。</p>
+<h1 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h1><p>阅读代码，思考该程序的输出是什么</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"> <span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line">  </span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span></span>;</span><br><span class="line">  </span><br><span class="line"> <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">      <span class="keyword">int</span> a = <span class="number">10</span>, b = <span class="number">20</span>;</span><br><span class="line">  </span><br><span class="line">      swap(a, b);</span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">&quot;a=%d\nb=%d\n&quot;</span>, a, b);</span><br><span class="line"> </span><br><span class="line">     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span></span></span><br><span class="line"><span class="function"> </span>&#123;</span><br><span class="line">     <span class="keyword">int</span> t; </span><br><span class="line">     t = x;</span><br><span class="line">     x = y;</span><br><span class="line">     y = t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="内存与地址"><a href="#内存与地址" class="headerlink" title="内存与地址"></a>内存与地址</h3><p>在计算机中，数据是存放在内存单元中的，一般把内存中的一个字节称为一个内存单元。为了更方便地访问这些内存单元，可预先给内存中的所有内存单元进行地址编号，根据地址编号，可准确找到其对应的内存单元。由于每一个地址编号均对应一个内存单元，因此可以形象地说一个地址编号就指向一个内存单元。C 语言中把地址形象地称作指针。</p>
+<p>C语言中的每个变量均对应内存中的一块内存空间，而内存中每个内存单元均是有地址编号的。在 C 语言中，可以使用运算符 &amp; 求某个变量的地址。  </p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		    <span class="keyword">char</span> c=<span class="string">&#x27;A&#x27;</span>;</span><br><span class="line">		    <span class="keyword">int</span> a=<span class="number">100</span>;</span><br><span class="line">		    <span class="built_in">printf</span>(<span class="string">&quot;a=%d\n&quot;</span>,a);<span class="comment">//输出变量a的值</span></span><br><span class="line">		    <span class="built_in">printf</span>(<span class="string">&quot;&amp;a=%x\n&quot;</span>,&amp;a);<span class="comment">//输出变量a的地址</span></span><br><span class="line">		    <span class="built_in">printf</span>(<span class="string">&quot;c=%c\n&quot;</span>,c);</span><br><span class="line">		    <span class="built_in">printf</span>(<span class="string">&quot;&amp;c=%x\n&quot;</span>,&amp;c);</span><br><span class="line">		    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">//某次运行的结果：</span></span><br><span class="line">a=<span class="number">100</span></span><br><span class="line">&amp;a=<span class="number">12f</span>f40</span><br><span class="line">c=A</span><br><span class="line">&amp;c=<span class="number">12f</span>f44</span><br></pre></td></tr></table></figure>
+
+<p>区分<strong>变量的地址值</strong>和<strong>变量的值</strong>。如上例中，变量 a 的地址值（指针值）为12ff40，而变量 a 的值为 100。</p>
+<p><img src="https://i.loli.net/2020/10/24/vhnxw4NeKoPQ5rW.jpg" alt="IMG_0037(20201024-223351).PNG"></p>
+<p><img src="https://i.loli.net/2020/10/23/dXrR49sACthvVSz.png" alt="屏幕截图(52).png"></p>
+<p>一个指针是一个地址，是一个常量。而一个指针变量却可以被赋予不同的指针值，是变量。但是常把指针变量简称为指针。为了避免混淆，我们约定：“指针” 是指地址，是常量，“指针变量”是指取值为地址的变量。</p>
+<p>指针名、数组名、函数名就是地址，它们分别表示指针所指向元素的地址、数组的首地址和函数的入口地址</p>
+<h4 id="指针变量的-定义格式-为："><a href="#指针变量的-定义格式-为：" class="headerlink" title="指针变量的 定义格式 为："></a>指针变量的 <strong>定义格式</strong> 为：</h4><p>数据类型符  * 变量名;  </p>
+<p>如：    </p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> *p1; </span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="指针变量初始化的方法："><a href="#指针变量初始化的方法：" class="headerlink" title="指针变量初始化的方法："></a>指针变量初始化的方法：</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a;  </span><br><span class="line"><span class="keyword">int</span> *p = &amp;a; <span class="comment">//&amp;为取址运算符，&amp;a即为取a的地址</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="引用指针变量"><a href="#引用指针变量" class="headerlink" title="引用指针变量"></a>引用指针变量</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a; </span><br><span class="line"><span class="keyword">int</span> *p = &amp;a; <span class="comment">// p指向a ，相当于*p就是a的别名</span></span><br><span class="line">*p = <span class="number">10</span>; <span class="comment">// 相当于 a = 10;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="void-类型指针"><a href="#void-类型指针" class="headerlink" title="void*类型指针"></a>void*类型指针</h3><p>表示形式为 void*p;表示<strong>不指定 p 是指向哪一种数据类型的指针变量</strong>。使用时要进行强制类型转换。例如： </p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">char</span> *p1; </span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> *p2;  </span><br><span class="line"></span><br><span class="line">p1 = (<span class="keyword">char</span> *)p2;  </span><br><span class="line"></span><br><span class="line">p2 = (<span class="keyword">void</span> *)p1;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="空指针NULL"><a href="#空指针NULL" class="headerlink" title="空指针NULL"></a>空指针NULL</h3><p>在C语言中，如果一个指针不指向任何数据，我们就称之为空指针，用NULL</p>
+<p> 表示。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> *p = <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure>
+
+<p>注意区分大小写，null 没有任何特殊含义，只是一个普通的标识符。</p>
+<p>NULL 是一个宏定义，在stdio.h被定义为：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NULL ((void *)0)</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>我们知道，变量一旦定义就要分配内存，指针变量也是如此。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> *p;  <span class="comment">//它不是空指针</span></span><br></pre></td></tr></table></figure>
+
+<p>它的值是随机的，是垃圾值，如果不小心使用了它，运行时一般会引起段错误，导致程序退出，甚至会不知不觉地修改数据。</p>
+<p><strong>所以，为了实现交换两个数的值的功能，可以将形参改为接收实参的地址</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"> <span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line">  </span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span> *x, <span class="keyword">int</span> *y)</span></span>;</span><br><span class="line">  </span><br><span class="line"> <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function">  </span>&#123;  </span><br><span class="line">      <span class="keyword">int</span> a = <span class="number">10</span>, b = <span class="number">20</span>;</span><br><span class="line">  </span><br><span class="line">      swap(a, b);</span><br><span class="line">     <span class="built_in">printf</span>(<span class="string">&quot;a=%d\nb=%d\n&quot;</span>, a, b);</span><br><span class="line"> </span><br><span class="line">     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span> *x, <span class="keyword">int</span> *y)</span></span></span><br><span class="line"><span class="function"> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> t;</span><br><span class="line">    t = *x;</span><br><span class="line">    *x = *y;</span><br><span class="line">    *y = t;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+<h3 id="malloc-与-free"><a href="#malloc-与-free" class="headerlink" title="malloc 与 free"></a>malloc 与 free</h3><h4 id="malloc"><a href="#malloc" class="headerlink" title="malloc"></a>malloc</h4><hr>
+<p><strong>头文件</strong>：<code>stdlib</code></p>
+<p><strong>原型</strong>：<code>void malloc(size_t size)</code></p>
+<p><em>所以需要根据实际你需要的类型对其强制类型转换</em></p>
+<p><strong>返回值</strong></p>
+<p>成功时，返回指向新分配内存的指针。<br>失败时，返回空指针（NULL）</p>
+<p><strong>参数：</strong>size : 要分配的字节数</p>
+<h3 id="free"><a href="#free" class="headerlink" title="free"></a><strong>free</strong></h3><hr>
+<p><strong>头文件</strong>：<code>stdlib</code><br><strong>原型</strong>：<code>void free( void* ptr );</code><br><strong>参数</strong>：指向要解分配的内存的指针<br><strong>返回值</strong>：无</p>
+<p>我们需要一个大小为 N ( N &lt; 1000)的数组,我们可能会想写成arr[N]，由输入决定数组的大小，但是这样写编译会出错。</p>
+<p>所以我们通常这么写：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> arr[<span class="number">1000</span>] = &#123; <span class="number">0</span> &#125;;</span><br><span class="line">    <span class="keyword">int</span> N = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;请输入数组的大小\n&quot;</span>);</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;N);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;请输入%d个数\n&quot;</span>, N);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;arr[i]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是这样的不确定可能会造成空间的浪费。</p>
+<p>其实我们可以这样写</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int* arr &#x3D; (int*)malloc(sizeof(int) * N)</span><br></pre></td></tr></table></figure>
+
+<p>该代码定义了一个指针arr指向sizeof(int) * N这么大的空间</p>
+]]></content>
+      <tags>
+        <tag>C</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2020/10/02/hello-world/</url>
     <content><![CDATA[<p>We=lcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
