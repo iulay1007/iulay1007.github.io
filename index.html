@@ -289,7 +289,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2020-11-29 00:29:11 / 修改时间：00:27:30" itemprop="dateCreated datePublished" datetime="2020-11-29T00:29:11+08:00">2020-11-29</time>
+      <time title="创建时间：2020-11-29 00:29:11 / 修改时间：00:40:21" itemprop="dateCreated datePublished" datetime="2020-11-29T00:29:11+08:00">2020-11-29</time>
     </span>
 
   
@@ -305,47 +305,14 @@
           <h3 id="Activity的基本状态"><a href="#Activity的基本状态" class="headerlink" title="Activity的基本状态"></a>Activity的基本状态</h3><hr>
 <h4 id="活动状态-running"><a href="#活动状态-running" class="headerlink" title="活动状态(running)"></a>活动状态(running)</h4><p>活动状态一般是指该Activity正处于屏幕最显著的位置上显示，即该Activity是在Android活动栈的最顶端。 此时它处于可见并可和用户交互的状态。</p>
 <h4 id="暂停状态-paused"><a href="#暂停状态-paused" class="headerlink" title="暂停状态(paused)"></a><strong>暂停状态(paused)</strong></h4><p>暂停状态一般指该Activity已失去了焦点但仍然是可见的状态(包括部分可见)。不可以触摸操作。失去焦点即被一个新的非全屏的Activity或者一个透明的Activity覆盖</p>
-<h4 id="停止状态-stopped"><a href="#停止状态-stopped" class="headerlink" title="停止状态(stopped)"></a><strong>停止状态(stopped)</strong></h4><p>停止状态一般指该Activity被另一个Activity完全覆盖的状态</p>
-<p>此状态下，该Activity的数据会暂时保留，但是，一旦系统需要内存，这种处于Stopped状态的Activity占用的空间会优先被清理并重新利用</p>
-<h4 id="销毁状态-killed"><a href="#销毁状态-killed" class="headerlink" title="销毁状态(killed)"></a>销毁状态(killed)</h4><p>此时Activity已从Activity栈中移除，在内存中不存在</p>
-<h3 id="Activity的状态转换"><a href="#Activity的状态转换" class="headerlink" title="Activity的状态转换"></a>Activity的状态转换</h3><hr>
-<p><img src="https://i.loli.net/2020/11/27/sfaq5YNBzuGKWvb.png" alt="屏幕截图(65).png"></p>
-<h3 id="Activity的生命周期"><a href="#Activity的生命周期" class="headerlink" title="Activity的生命周期"></a>Activity的生命周期</h3><hr>
-<p><img src="https://i.loli.net/2020/11/27/bUiop372zD6X8gx.png" alt="屏幕截图(63).png"></p>
-<p><strong><em>onCreate ( )</em></strong>: 首次创建Activity时调用。进行Activity的一些初始化工作，比如使用setContentView加载布局，对一些控件和变量进行初始化等。</p>
-<p><strong><em>onStart ( )</em></strong> : 此时Activity已经<strong>可见</strong>了，但是还在后台，我们还看不到，无法与Activity交互。可以理解为Activity已经显示出来了，但是我们还看不见</p>
-<p><strong><em>onResume ( )</em></strong> : Activity在这个阶段已经出现在前台并且<strong>可见</strong>了（处于running状态）。</p>
-<p><strong><em>onPause ( )</em></strong> :表示暂停(paused状态），当Activity要跳到另一个Activity或应用正常退出时都会执行这个方法。我们可以进行一些轻量级的存储数据和去初始化的工作，不能太耗时，因为在跳转Activity时只有当一个Activity执行完了onPause方法后另一个Activity才会启动，而且Android中指定如果onPause在500ms即0.5秒内没有执行完毕的话就会强制关闭Activity。</p>
-<p><strong><em>onStop ( )</em></strong> :表示即将停止，此时Activity不可见。当Activity即将被销毁或被另一个Activity覆盖，则会调用onStop。如果新的Activity采用了透明主题，则不会回调onStop。这个阶段可以做一些微重量级的回收工作，同样不能太耗时。</p>
-<p><strong><em>onDestroy ( )</em></strong> : Activity被销毁时调用。点击返回键或Activity里调用了finish方法或系统内存不足而选择强杀app时会调用onDestroy。在这里可以做一些回收工作和最终的资源释放。</p>
-<p><strong><em>onRestart( )</em></strong> ：表示重新开始，Activity在这时<strong>可见</strong>，当用户按Home键切换到桌面后又切回来或者从后一个Activity切回前一个Activity就会触发这个方法。</p>
-<h4 id=""><a href="#" class="headerlink" title=""></a></h4><p>从整个生命周期来说，**<em>onCreate和onDestroy**</em>是配对的，分别标识着Activity的创建和销毁，并且只会调用一次。</p>
-<p>从Activity是否在前台来说，**<em>onResume和onPause**</em>是配对的，随着用户的操作或设备屏幕的点亮和熄灭，这两个方法可以被多次调用。</p>
-<p>从Activity是否可见来说，**<em>onStart和onStop**</em>是配对的，随着用户的操作或设备屏幕的点亮和熄灭，这两个方法可以被多次调用。</p>
-<h4 id="打开一个app的MainActivity并跳转到另一个Activity时的生命周期"><a href="#打开一个app的MainActivity并跳转到另一个Activity时的生命周期" class="headerlink" title="打开一个app的MainActivity并跳转到另一个Activity时的生命周期"></a>打开一个app的MainActivity并跳转到另一个Activity时的生命周期</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;某一个Activity第一次启动，回调为：onCreate-&gt;onStart-&gt;onResume</span><br><span class="line">&#x2F;com.example.activitytest I&#x2F;.MainActivity :onCreate</span><br><span class="line">&#x2F;com.example.activitytest I&#x2F;.MainActivity :onStart</span><br><span class="line">&#x2F;com.example.activitytest I&#x2F;.MainActivity :onResume</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;跳转到下一个Activity时</span><br><span class="line">当需要从MainActivity切换到SecondActivity时，先执行MainActivity中的与onResume()相对应的onPause()操作，比如关闭独占设备(比如相机），或其它耗费cpu的操作；</span><br><span class="line">以防SecondActivity也需要使用这些资源，关闭耗CPU的操作，也有利于SecondActivity运行的流畅。</span><br><span class="line"></span><br><span class="line">&#x2F;com.example.activitytest I&#x2F;.MainActivity :onPause</span><br><span class="line">&#x2F;com.example.activitytest I&#x2F;.SecondActivity :onCreate</span><br><span class="line">&#x2F;com.example.activitytest I&#x2F;.SecondActivity :onStart</span><br><span class="line">&#x2F;com.example.activitytest I&#x2F;.SecondActivity :onResume</span><br><span class="line">&#x2F;com.example.activitytest I&#x2F;.MainActivity :onStop</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="为什么不先执行MainActivity的onStop再执行SecondActivity的onCreate"><a href="#为什么不先执行MainActivity的onStop再执行SecondActivity的onCreate" class="headerlink" title="为什么不先执行MainActivity的onStop再执行SecondActivity的onCreate?"></a>为什么不先执行MainActivity的onStop再执行SecondActivity的onCreate?</h4><p>从用户体验的角度来分析,当用户触发某事件切换到新的Activity，用户肯定是想尽快进入新的视图进行操作。<br>MainActivity中比较消耗资源的部分在onPause时关闭后，再切换到SecondActivity中执行SecondActivity<br>的初始化，显示SecondActivity中的View后，用户可以进行交互。</p>
-<p>此时后台再去执行MainActivity的onStop()操作，即使这里面有些比较耗时的操作，也没有关系，这是在后台执行所以也不影响用户的体验。</p>
-<h3 id="Activity的优先级"><a href="#Activity的优先级" class="headerlink" title="Activity的优先级"></a>Activity的优先级</h3><hr>
-<p>从高到低：</p>
-<p>(1)前台Activity——正在与用户交互的Activity，优先级最高</p>
-<p>(2)可见但非前台Activity——比如Activity中弹出了一个对话框，导致Activity可见但位于后台无法和用户直接交互</p>
-<p>(3)后台Activity——已经被暂停的Activity，比如执行了onStop，优先级最低</p>
-<p>当系统内存不足时，会按照上述优先级去杀死Activity所在进程。</p>
-<h3 id="Activity的启动模式"><a href="#Activity的启动模式" class="headerlink" title="Activity的启动模式"></a>Activity的启动模式</h3><hr>
-<h4 id="standard"><a href="#standard" class="headerlink" title="standard"></a>standard</h4><p><strong>标准模式</strong>：如果不设置Activity的启动模式，系统会默认将其设置为standard。</p>
-<p>这种模式下，同一个Activity可以有多个实例，每次启动Activity，无论任务栈中是否已经有这个Activity的实例，系统都会创建一个新的Activity实例。</p>
-<p><img src="https://i.loli.net/2020/11/29/bnKkBhFUXQwjSmY.png" alt="20180606100919308.png"></p>
-<h4 id="singleTop"><a href="#singleTop" class="headerlink" title="singleTop"></a>singleTop</h4><p><strong>栈顶复用模式</strong>：在这种模式下，如果新启动的Activity已经位于任务栈的栈顶，那么此Activity不会被重新创建。</p>
-<p>如果新Activity的实例已存在但不位于栈顶，那么新Activity仍会重新创建。</p>
-<p><img src="https://i.loli.net/2020/11/29/lUGdxmt6nOkog5X.png" alt="2.png"></p>
-<h4 id="singleTask"><a href="#singleTask" class="headerlink" title="singleTask"></a>singleTask</h4><p><strong>栈内复用模式</strong>：这是一种单实例模式，一个栈中同一个Activity只存在唯一一个实例，无论是否在栈顶，只要存在实例，都不会重新创建。但Activity已经存在但不位于栈顶时，系统就会把该Activity移到栈顶。会导致任务栈内它上面的Activity被销毁。</p>
-<p><img src="https://i.loli.net/2020/11/29/mOZjVPEzFMqaH3k.png" alt="3.png"></p>
-<h4 id="singleInstance"><a href="#singleInstance" class="headerlink" title="singleInstance"></a>singleInstance</h4><p><strong>单实例模式</strong>：这是一种加强的singleTask模式，它除了具有singleTask模式的所有特性外，还加强了一点，那就是此种模式的Activity只能单独地位于一个任务栈中，不同的应用去打开这个Activity 共用同一个Activity。在该模式下，我们会为目标Activity创建一个新的任务栈，将目标Activity放入新的任务栈，由于栈内复用的特性，后续的请求不会创建新的Activity，除非这个独特的任务栈被系统销毁了。</p>
-<p><img src="https://i.loli.net/2020/11/29/uxdQ1EsDAoCOfIt.png" alt="4.png"></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/11/29/Activity%E7%9B%B8%E5%85%B3/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -395,10 +362,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2020-10-25 00:51:49 / 修改时间：01:19:09" itemprop="dateCreated datePublished" datetime="2020-10-25T00:51:49+08:00">2020-10-25</time>
+      <time title="创建时间：2020-10-25 00:51:49" itemprop="dateCreated datePublished" datetime="2020-10-25T00:51:49+08:00">2020-10-25</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-29 00:34:25" itemprop="dateModified" datetime="2020-11-29T00:34:25+08:00">2020-11-29</time>
+      </span>
 
   
 </div>
