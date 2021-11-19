@@ -474,6 +474,10 @@
     <content><![CDATA[<h1 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>HashMap 是一个<strong>散列表</strong>(hash table)，它存储的内容是<strong>键值对(key-value)映射</strong>。</p>
 <p>HashMap 继承于AbstractMap，实现了 Map、Cloneable、java.io.Serializable 接口。</p>
 <p><img src="https://i.loli.net/2021/11/10/kYDtBx2dwRmeKTS.png" alt="未命名文件 (15).png"></p>
+<a id="more"></a>
+
+
+
 <blockquote>
 <p>HashMap既然继承了AbstractMap为什么还要实现Map</p>
 <p>据java集合框架的创始人Josh Bloch描述，这样的写法是一个失误。</p>
