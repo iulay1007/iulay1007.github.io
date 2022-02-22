@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title></title>
+    <title>Activity的基本状态</title>
     <url>/2020/11/29/Activity%E7%9B%B8%E5%85%B3/</url>
-    <content><![CDATA[<h3 id="Activity的基本状态"><a href="#Activity的基本状态" class="headerlink" title="Activity的基本状态"></a>Activity的基本状态</h3><hr>
-<h4 id="活动状态-running"><a href="#活动状态-running" class="headerlink" title="活动状态(running)"></a>活动状态(running)</h4><p>活动状态一般是指该Activity正处于屏幕最显著的位置上显示，即该Activity是在Android活动栈的最顶端。 此时它处于可见并可和用户交互的状态。</p>
+    <content><![CDATA[<h4 id="活动状态-running"><a href="#活动状态-running" class="headerlink" title="活动状态(running)"></a>活动状态(running)</h4><p>活动状态一般是指该Activity正处于屏幕最显著的位置上显示，即该Activity是在Android活动栈的最顶端。 此时它处于可见并可和用户交互的状态。</p>
 <h4 id="暂停状态-paused"><a href="#暂停状态-paused" class="headerlink" title="暂停状态(paused)"></a><strong>暂停状态(paused)</strong></h4><p>暂停状态一般指该Activity已失去了焦点但仍然是可见的状态(包括部分可见)。不可以触摸操作。失去焦点即被一个新的非全屏的Activity或者一个透明的Activity覆盖</p>
 <a id="more"></a>
 
@@ -140,7 +139,7 @@
       </tags>
   </entry>
   <entry>
-    <title></title>
+    <title>Handler</title>
     <url>/2021/03/27/Handler/</url>
     <content><![CDATA[<h3 id="为什么需要Handler"><a href="#为什么需要Handler" class="headerlink" title="为什么需要Handler"></a>为什么需要Handler</h3><hr>
 <p>Handler的主要作用是将一个任务切换到某个指定的指定的线程中执行。而Handler常常可以用于在子线程更新UI。</p>
@@ -228,7 +227,7 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
+    <title>对象访问方式及四大引用</title>
     <url>/2021/03/13/%E5%AF%B9%E8%B1%A1%E8%AE%BF%E9%97%AE%E6%96%B9%E5%BC%8F%E5%8F%8A%E5%9B%9B%E5%A4%A7%E5%BC%95%E7%94%A8/</url>
     <content><![CDATA[<h2 id="Java中对象的访问方式"><a href="#Java中对象的访问方式" class="headerlink" title="Java中对象的访问方式"></a>Java中对象的访问方式</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>建立对象是为了使用对象，我们的Java程序需要通过栈上的reference数据来操作堆上的具体对象。由于reference类型在Java虚拟机规范中只规定了一个指向对象的引用，<strong>并没有定义这个引用应该通过何种方式去定位、访问堆中的对象的具体位置</strong>，所以对象访问方式也是<strong>取决于虚拟机实现的</strong>。目前主流的访问方式有使用<strong>句柄和直接指针</strong>两种</p>
 <a id="more"></a>
@@ -289,9 +288,9 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
+    <title>Hashmap</title>
     <url>/2021/11/19/HashMap/</url>
-    <content><![CDATA[<h1 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>HashMap 是一个<strong>散列表</strong>(hash table)，它存储的内容是<strong>键值对(key-value)映射</strong>。</p>
+    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>HashMap 是一个<strong>散列表</strong>(hash table)，它存储的内容是<strong>键值对(key-value)映射</strong>。</p>
 <p>HashMap 继承于AbstractMap，实现了 Map、Cloneable、java.io.Serializable 接口。</p>
 <p><img src="https://i.loli.net/2021/11/10/kYDtBx2dwRmeKTS.png" alt="未命名文件 (15).png"></p>
 <a id="more"></a>
@@ -400,9 +399,9 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
+    <title>ViewPager及懒加载与预加载分析</title>
     <url>/2021/10/15/ViewPager/</url>
-    <content><![CDATA[<h1 id="ViewPager及懒加载与预加载分析"><a href="#ViewPager及懒加载与预加载分析" class="headerlink" title="ViewPager及懒加载与预加载分析"></a>ViewPager及懒加载与预加载分析</h1><h2 id="ViewPager的使用"><a href="#ViewPager的使用" class="headerlink" title="ViewPager的使用"></a>ViewPager的使用</h2><h3 id="常见用法"><a href="#常见用法" class="headerlink" title="常见用法"></a>常见用法</h3><hr>
+    <content><![CDATA[<h2 id="ViewPager的使用"><a href="#ViewPager的使用" class="headerlink" title="ViewPager的使用"></a>ViewPager的使用</h2><h3 id="常见用法"><a href="#常见用法" class="headerlink" title="常见用法"></a>常见用法</h3><hr>
 <p>网上一些教程上会运用以下方式在PagerAdapter中获取Fragment实例，即在构造PagerAdapter时传入相应的Fragment列表，也就是在构造PagerAdapter前已经将所有Fragment进行了初始化。</p>
 <a id="more"></a>
 
@@ -580,9 +579,9 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
+    <title>RxJava</title>
     <url>/2022/02/21/RxJava/</url>
-    <content><![CDATA[<h1 id="RxJava"><a href="#RxJava" class="headerlink" title="RxJava"></a>RxJava</h1><h3 id="创建被观察者"><a href="#创建被观察者" class="headerlink" title="创建被观察者"></a>创建被观察者</h3><h4 id="Observable"><a href="#Observable" class="headerlink" title="Observable"></a>Observable</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Observable</span>&lt;<span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">ObservableSource</span>&lt;<span class="title">T</span>&gt; </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<h3 id="创建被观察者"><a href="#创建被观察者" class="headerlink" title="创建被观察者"></a>创建被观察者</h3><h4 id="Observable"><a href="#Observable" class="headerlink" title="Observable"></a>Observable</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Observable</span>&lt;<span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">ObservableSource</span>&lt;<span class="title">T</span>&gt; </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
 
 <p>Observable是一个抽象类，实现了ObservableSource接口</p>
 <a id="more"></a>
@@ -822,7 +821,7 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
+    <title>RxJava的流控</title>
     <url>/2022/02/21/%E8%83%8C%E5%8E%8B/</url>
     <content><![CDATA[<h1 id="FlowControl-流控"><a href="#FlowControl-流控" class="headerlink" title="FlowControl(流控)"></a>FlowControl(流控)</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>在RxJava中，遇到这样一种情况并不困难:Observable发出条目的速度比操作符或订阅者消费它们的速度要快。这就提出了一个问题，即如何处理这种不断增长的未消耗项目的积压。</p>
 <a id="more"></a>
@@ -989,9 +988,9 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
+    <title>Retrofit中的设计模式</title>
     <url>/2022/02/21/Retrofit%E4%B8%AD%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<h1 id="Retrofit中的设计模式"><a href="#Retrofit中的设计模式" class="headerlink" title="Retrofit中的设计模式"></a>Retrofit中的设计模式</h1><p>首先看一下create()方法的使用流程</p>
+    <content><![CDATA[<p>首先看一下create()方法的使用流程</p>
 <p>我们需要根据自己的需要创建要进行的网络请求的接口</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyApi</span> </span>&#123;</span><br><span class="line">  <span class="meta">@GET(&quot;users/&#123;user&#125;/repos&quot;)</span></span><br><span class="line">  Call&lt;List&lt;Repo&gt;&gt; listRepos(<span class="meta">@Path(&quot;user&quot;)</span> String user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -1161,6 +1160,24 @@
 <p>真正执行网络请求的是传入的Call类型的实例，即OkHttpCall类型对象。而ExecutorCallbackCall为Call增加了指定线程的功能。在构造ExecutorCallbackCall时，可以传入Executor类型的实例。</p>
 <p>在调用enqueue()方法时，实际调用的是OkHttpCall的enqueue方法。而回调的方法是在传入的Executor类型实例的线程中的。</p>
 <p>如果你希望在主线程接受回调，通常需要通过Handler转换到主线程上去。而ExecutorCallbackCall可以指定线程，所以可以用于转换到主线程中。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>从HTML文件导入课表教程</title>
+    <url>/2022/02/22/%E4%BB%8EHTML%E6%96%87%E4%BB%B6%E5%AF%BC%E5%85%A5%E8%AF%BE%E8%A1%A8%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<p><strong>以Chrome浏览器为例</strong></p>
+<p>1、登录学校教务系统找到含有课表信息的网页</p>
+<p>2、在该网页界面右键，选择另存为并保存</p>
+<a id="more"></a>
+
+
+
+<p><img src="https://s2.loli.net/2022/02/22/JlAdq2bEzXuI3wY.png" alt="屏幕截图(283).png"></p>
+<p>3、将该html文件发送到手机上并在手机上保存</p>
+<p>4、在本App<strong>从HTML导入</strong>界面内选择学校/教务类型</p>
+<p>5、在本App<strong>从HTML导入</strong>界面内选择html文件</p>
+<p>6、找到刚刚在手机上保存的html文件</p>
+<p>7、在本App<strong>从HTML导入</strong>界面内点击导入课程即可</p>
 ]]></content>
   </entry>
 </search>

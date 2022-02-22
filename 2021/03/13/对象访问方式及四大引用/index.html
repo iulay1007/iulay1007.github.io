@@ -24,7 +24,7 @@
 
   <meta name="description" content="Java中对象的访问方式概述建立对象是为了使用对象，我们的Java程序需要通过栈上的reference数据来操作堆上的具体对象。由于reference类型在Java虚拟机规范中只规定了一个指向对象的引用，并没有定义这个引用应该通过何种方式去定位、访问堆中的对象的具体位置，所以对象访问方式也是取决于虚拟机实现的。目前主流的访问方式有使用句柄和直接指针两种">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SY">
+<meta property="og:title" content="对象访问方式及四大引用">
 <meta property="og:url" content="https://iulay1007.github.io/2021/03/13/%E5%AF%B9%E8%B1%A1%E8%AE%BF%E9%97%AE%E6%96%B9%E5%BC%8F%E5%8F%8A%E5%9B%9B%E5%A4%A7%E5%BC%95%E7%94%A8/index.html">
 <meta property="og:site_name" content="SY">
 <meta property="og:description" content="Java中对象的访问方式概述建立对象是为了使用对象，我们的Java程序需要通过栈上的reference数据来操作堆上的具体对象。由于reference类型在Java虚拟机规范中只规定了一个指向对象的引用，并没有定义这个引用应该通过何种方式去定位、访问堆中的对象的具体位置，所以对象访问方式也是取决于虚拟机实现的。目前主流的访问方式有使用句柄和直接指针两种">
@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://i.loli.net/2021/03/11/CbEAo3MBj5Fmi1e.png">
 <meta property="og:image" content="https://i.loli.net/2021/03/11/OLu2gwoP46xBsNE.png">
 <meta property="article:published_time" content="2021-03-13T11:12:04.642Z">
-<meta property="article:modified_time" content="2021-03-13T11:20:05.092Z">
+<meta property="article:modified_time" content="2022-02-21T11:31:14.989Z">
 <meta property="article:author" content="sy">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://i.loli.net/2021/03/12/NHmak9JWL5p3qzf.jpg">
@@ -54,7 +54,7 @@
   };
 </script>
 
-  <title> | SY</title>
+  <title>对象访问方式及四大引用 | SY</title>
   
 
 
@@ -224,7 +224,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -288,7 +288,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
+          对象访问方式及四大引用
         </h1>
 
         <div class="post-meta-container">
@@ -298,10 +298,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2021-03-13 19:12:04 / 修改时间：19:20:05" itemprop="dateCreated datePublished" datetime="2021-03-13T19:12:04+08:00">2021-03-13</time>
+      <time title="创建时间：2021-03-13 19:12:04" itemprop="dateCreated datePublished" datetime="2021-03-13T19:12:04+08:00">2021-03-13</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2022-02-21 19:31:14" itemprop="dateModified" datetime="2022-02-21T19:31:14+08:00">2022-02-21</time>
+      </span>
 
   
 </div>
@@ -382,13 +388,13 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2020/11/29/Activity%E7%9B%B8%E5%85%B3/" rel="prev" title="">
-                  <i class="fa fa-chevron-left"></i> 
+                <a href="/2020/11/29/Activity%E7%9B%B8%E5%85%B3/" rel="prev" title="Activity的基本状态">
+                  <i class="fa fa-chevron-left"></i> Activity的基本状态
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2021/03/27/Handler/" rel="next" title="">
-                   <i class="fa fa-chevron-right"></i>
+                <a href="/2021/03/27/Handler/" rel="next" title="Handler">
+                  Handler <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
