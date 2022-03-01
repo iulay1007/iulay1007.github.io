@@ -1495,4 +1495,125 @@
 <p>在需要的时候对这个方法进行重写，定义何时返回true表示删除最近最少使用的节点。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;K,V&gt; eldest)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
   </entry>
+  <entry>
+    <title>Observable的变种</title>
+    <url>/2022/03/01/Observable%E7%9A%84%E5%8F%98%E7%A7%8D/</url>
+    <content><![CDATA[<h3 id="Observable及其变种简介"><a href="#Observable及其变种简介" class="headerlink" title="Observable及其变种简介"></a>Observable及其变种简介</h3><table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Observable<T></td>
+<td>能够发射0或n个数据，并以成功或错误事件终止。</td>
+</tr>
+<tr>
+<td align="left">Flowable<T></td>
+<td>能够发射0或n个数据，并以成功或错误事件终止。 支持Backpressure，可以控制数据源发射的速度。</td>
+</tr>
+<tr>
+<td align="left">Single<T></td>
+<td>只发射单个数据或错误事件。</td>
+</tr>
+<tr>
+<td align="left">Completable</td>
+<td>它从来不发射数据，只处理 onComplete 和 onError 事件。</td>
+</tr>
+<tr>
+<td align="left">Maybe<T></td>
+<td>能够发射0（onCompleted（））或者1（onSuccess（））个数据，要么成功，要么失败。</td>
+</tr>
+</tbody></table>
+<a id="more"></a>
+
+<h3 id="观察者的回调方法"><a href="#观察者的回调方法" class="headerlink" title="观察者的回调方法"></a>观察者的回调方法</h3><p><strong>onNext:</strong> 普通事件，将要处理的事件添加到事件队列中</p>
+<p>**onCompleted:**事件队列完结。RxJava不仅把每个事件单独处理，还会把它们看成一个队列。当不再有新的onNext时，需调用onCompleted()作为完成的标志</p>
+<p>**onError:**事件队列异常。当事件处理过程出现异常时，会调用onError()，同时队列自动终止，不再有事件发出</p>
+<blockquote>
+<p>onCompleted只是一个通知方法，无法进行参数传递</p>
+<p>而onNext方法是含有参数的，所以可以进行被观察者到观察者的消息传递</p>
+</blockquote>
+<h3 id="Flowable"><a href="#Flowable" class="headerlink" title="Flowable"></a>Flowable</h3><h4 id="Backpressure"><a href="#Backpressure" class="headerlink" title="Backpressure"></a>Backpressure</h4><p>在 RxJava 中， 有一种场景，被观察者发送消息太快以至于它的操作符或者订阅者不能及时处理相关的消息，这样就会产生很多下游没来得及处理的数据，这些数据既不会丢失，也不会被垃圾回收机制回收，而是存放在一个异步缓存池中，如果缓存池中的数据一直得不到处理，越积越多，最后就会造成内存溢出。</p>
+<p>这就是反压的应用场景。</p>
+<p>具体的可以看我的另一篇关于流控的文章。</p>
+<h4 id="Flowable-create"><a href="#Flowable-create" class="headerlink" title="Flowable#create()"></a>Flowable#create()</h4><p><code>Flowable</code> 的异步缓存池不同于 <code>Observable</code>，<code>Observable</code>的异步缓存池没有大小限制，可以无限制向里添加数据，直至OOM,而 <code>Flowable</code> 的异步缓存池有个固定容量，其大小为128。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Flowable&lt;T&gt; <span class="title">create</span><span class="params">(FlowableOnSubscribe&lt;T&gt; source, BackpressureStrategy mode)</span> </span>&#123;</span><br><span class="line">    ObjectHelper.requireNonNull(source, <span class="string">&quot;source is null&quot;</span>);</span><br><span class="line">    ObjectHelper.requireNonNull(mode, <span class="string">&quot;mode is null&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> FlowableCreate&lt;T&gt;(source, mode));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>BackpressureStrategy</code> 的作用便是用来设置 <code>Flowable</code> 异步缓存池中的存储数据超限时的策略。<br><code>BackpressureStrategy</code> 提供了一下几种背压策略：</p>
+<ul>
+<li>MISSING：这种策略模式下相当于没有指定任何的背压策略，不会对数据做缓存或丢弃处理，需要下游通过背压操作符（onBackpressureBuffer()/onBackpressureDrop()/onBackpressureLatest()）指定背压策略。</li>
+<li>ERROR：这种策略模式下如果缓存池中的数据超限了，则会抛出 <code>MissingBackpressureException</code> 异常</li>
+<li>BUFFER：这种策略模式下没有为异步缓存池限制大小，可以无限制向里添加数据，不会抛出 <code>MissingBackpressureException</code> 异常，但会导致OOM。</li>
+<li>DROP：这种策略模式下如果异步缓存池满了，会丢掉将要放入缓存池中的数据。</li>
+<li>LATEST：这种策略模式下与 Drop 策略一样，如果缓存池满了，会丢掉将要放入缓存池中的数据，不同的是，不管缓存池的状态如何，LATEST都会将最后一条数据强行放入缓存池中。</li>
+</ul>
+<p>RxJava 提供了下面的操作符来指定背压策略。</p>
+<ul>
+<li>onBackpressureBuffer()：对应BUFFER策略</li>
+<li>onBackpressureDrop()：对应DROP策略</li>
+<li>onBackpressureLatest()：对应LATEST策略</li>
+</ul>
+<p><a href="https://www.heqiangfly.com/2017/10/14/open-source-rxjava-guide-flowable/">https://www.heqiangfly.com/2017/10/14/open-source-rxjava-guide-flowable/</a></p>
+<h3 id="Single"><a href="#Single" class="headerlink" title="Single"></a>Single</h3><h4 id="Single-create"><a href="#Single-create" class="headerlink" title="Single#create()"></a>Single#create()</h4><p>创建的方式和Observable很相似</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Single&lt;T&gt; <span class="title">create</span><span class="params">(SingleOnSubscribe&lt;T&gt; source)</span> </span>&#123;</span><br><span class="line">    ObjectHelper.requireNonNull(source, <span class="string">&quot;source is null&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> SingleCreate&lt;T&gt;(source));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="SingleOnSubscribe-subscribe"><a href="#SingleOnSubscribe-subscribe" class="headerlink" title="SingleOnSubscribe#subscribe()"></a>SingleOnSubscribe#subscribe()</h4><p>subscribe的不同在于它的参数类型</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">subscribe</span><span class="params">(<span class="meta">@NonNull</span> SingleEmitter&lt;T&gt; emitter)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="SingleEmitter"><a href="#SingleEmitter" class="headerlink" title="SingleEmitter"></a>SingleEmitter</h4><p>它并没有onNext或onComplete方法。所以它只能发送一个事件或错误事件。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(<span class="meta">@NonNull</span> T t)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Signal an exception.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> t the exception, not null</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">onError</span><span class="params">(<span class="meta">@NonNull</span> Throwable t)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><p>有时候需要发射的数据并不是数据流的形式，而只是一条单一的数据，比如发起一次网络请求。在这种情况下，如果我们使用 Observable，onComplete会紧跟着onNext被调用，为什么不能将这连个方法合二为一呢。如果再这种情况下我们再使用Observable 就显得有点大材小用，因为我们不需要处理onNext() 的数据。于是，为了满足这种单一数据的使用场景，便出现了 Single。</p>
+<h3 id="Completable"><a href="#Completable" class="headerlink" title="Completable"></a>Completable</h3><p>没有数据处理的方法，只有通知相关的方法。它只发射一条完成通知，或者一条异常通知，不能发射数据，其中完成通知与异常通知只能发射一个</p>
+<h4 id="Completable-create"><a href="#Completable-create" class="headerlink" title="Completable#create()"></a>Completable#create()</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Completable <span class="title">create</span><span class="params">(CompletableOnSubscribe source)</span> </span>&#123;</span><br><span class="line">    ObjectHelper.requireNonNull(source, <span class="string">&quot;source is null&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> CompletableCreate(source));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="CompletableOnSubscribe-subscribe"><a href="#CompletableOnSubscribe-subscribe" class="headerlink" title="CompletableOnSubscribe#subscribe()"></a>CompletableOnSubscribe#subscribe()</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">subscribe</span><span class="params">(<span class="meta">@NonNull</span> CompletableEmitter var1)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="CompletableEmitter"><a href="#CompletableEmitter" class="headerlink" title="CompletableEmitter"></a>CompletableEmitter</h4><p>没有onNext和onSuccess方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void onComplete();</span><br><span class="line"></span><br><span class="line">void onError(@NonNull Throwable var1);</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用场景-1"><a href="#使用场景-1" class="headerlink" title="使用场景"></a>使用场景</h4><p>我们向服务器发起一个更新数据的请求，服务器更新数据以后是返回的是更新的结果。这个时候我们或许只是关心的是服务器更新数据是否成功，而不需要对数据进行处理，那么这个时候用 Completable 就可以</p>
+<h3 id="Maybe"><a href="#Maybe" class="headerlink" title="Maybe"></a>Maybe</h3><h4 id="思想"><a href="#思想" class="headerlink" title="思想"></a>思想</h4><p>该流可以发出单个值，要么成功，要么失败</p>
+<p>Maybe是一种特殊的Observable，它只能发出0或1个项目，并且在失败时报告错误。</p>
+<p>在这方面，它就像是Single和Completable的结合。所有这些简化类型，包括Maybe，提供了一个Flowable操作符的子集。这意味着我们可以像使用Flowable一样使用Maybe，只要操作对0或1个条目有意义。</p>
+<p>因为它只能释放一个值，所以它不像Flowable那样支持反压处理</p>
+<h4 id="Maybe-create"><a href="#Maybe-create" class="headerlink" title="Maybe#create()"></a>Maybe#create()</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">Maybe&lt;T&gt; <span class="title">create</span><span class="params">(MaybeOnSubscribe&lt;T&gt; onSubscribe)</span> </span>&#123;</span><br><span class="line">    ObjectHelper.requireNonNull(onSubscribe, <span class="string">&quot;onSubscribe is null&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> MaybeCreate(onSubscribe));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="MaybeOnSubscribe-subscribe"><a href="#MaybeOnSubscribe-subscribe" class="headerlink" title="MaybeOnSubscribe#subscribe()"></a>MaybeOnSubscribe#subscribe()</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">subscribe</span><span class="params">(<span class="meta">@NonNull</span> MaybeEmitter&lt;T&gt; var1)</span> <span class="keyword">throws</span> Exception</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="MaybeEmitter"><a href="#MaybeEmitter" class="headerlink" title="MaybeEmitter"></a>MaybeEmitter</h4><p>没有onNext方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(<span class="meta">@NonNull</span> T var1)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">onError</span><span class="params">(<span class="meta">@NonNull</span> Throwable var1)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">onComplete</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Maybe.just(<span class="number">1</span>)</span><br><span class="line">  .map(x -&gt; x + <span class="number">7</span>)</span><br><span class="line">  .filter(x -&gt; x &gt; <span class="number">0</span>)</span><br><span class="line">  .test()</span><br><span class="line">  .assertResult(<span class="number">8</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="onSuccess、onError和onComplete"><a href="#onSuccess、onError和onComplete" class="headerlink" title="onSuccess、onError和onComplete"></a>onSuccess、onError和onComplete</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Maybe.just(<span class="number">1</span>)</span><br><span class="line">    .subscribe(</span><br><span class="line">        x -&gt; System.out.print(<span class="string">&quot;Emitted item: &quot;</span> + x),</span><br><span class="line">        ex -&gt; System.out.println(<span class="string">&quot;Error: &quot;</span> + ex.getMessage()),</span><br><span class="line">        () -&gt; System.out.println(<span class="string">&quot;Completed. No items.&quot;</span>)</span><br><span class="line">     );</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码将<strong>print： Emitted item: 1</strong></p>
+<p> 因为source发出的是onSuccess信号</p>
+<p>若是<strong>Maybe.empty().subscribe(…)</strong> </p>
+<p>将 print “Completed. No items.”</p>
+<p>若是<strong>Maybe.error(new Exception(“error”)).subscribe(…)</strong></p>
+<p> 将 print “Error: error”</p>
+<p>这些事件对Maybe来说是<strong>相互排斥</strong>的。也就是说，**<em>onComplete不会在onSuccess之后被调用**</em>。</p>
+<p><strong>这与Flowable略有不同</strong>，因为onComplete将在流完成时被调用，甚至可能在一些onNext调用之后。</p>
+<p><strong>Single</strong>没有像Maybe那样的onComplete信号</p>
+<p><strong>Completable</strong>缺少onSuccess，因为它只用于处理完成/失败的情况。</p>
+<h4 id="与Flowable"><a href="#与Flowable" class="headerlink" title="与Flowable"></a>与Flowable</h4><p>Maybe类型的另一个用例是将它与Flowable结合使用。<strong>firstElement()方法可以用来从Flowable中创建Maybe:</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Flowable&lt;String&gt; visitors = ...</span><br><span class="line">visitors</span><br><span class="line">  .skip(<span class="number">1000</span>)</span><br><span class="line">  .firstElement()</span><br><span class="line">  .subscribe(</span><br><span class="line">    v -&gt; System.out.println(<span class="string">&quot;1000th visitor: &quot;</span> + v + <span class="string">&quot; won the prize&quot;</span>), </span><br><span class="line">    ex -&gt; System.out.print(<span class="string">&quot;Error: &quot;</span> + ex.getMessage()), </span><br><span class="line">    () -&gt; System.out.print(<span class="string">&quot;We need more marketing&quot;</span>));</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="使用场景-2"><a href="#使用场景-2" class="headerlink" title="使用场景"></a>使用场景</h4><p>可发射一条单一的数据，以及发射一条完成通知，或者一条异常通知，其中完成通知和异常通知只能发射一个，发射数据只能在发射完成通知或者异常通知之前，否则发射数据无效。</p>
+]]></content>
+  </entry>
 </search>
