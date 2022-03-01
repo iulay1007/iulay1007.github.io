@@ -288,7 +288,7 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Hashmap</title>
+    <title>HashMap</title>
     <url>/2021/11/19/HashMap/</url>
     <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>HashMap 是一个<strong>散列表</strong>(hash table)，它存储的内容是<strong>键值对(key-value)映射</strong>。</p>
 <p>HashMap 继承于AbstractMap，实现了 Map、Cloneable、java.io.Serializable 接口。</p>
@@ -817,7 +817,6 @@
 
 <h4 id="注释1"><a href="#注释1" class="headerlink" title="注释1"></a>注释1</h4><p><strong>Response<T> response = call.execute();</strong></p>
 <p>又见到了熟悉的call.execute()，这个是我们在不用RxJava时，常用的开启网络请求的方法。它只是被包装在Observable中，最终还是会被调用来进行网络请求。</p>
-<p>TODO:适配器or装饰模式</p>
 ]]></content>
   </entry>
   <entry>
@@ -1404,5 +1403,96 @@
 <p>10、找到刚刚在手机上保存的后缀为.xls的文件</p>
 <p>11、在本App<strong>从EXCEL导入</strong>界面内点击导入课程即可</p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>LruCache</title>
+    <url>/2022/03/01/LruCache%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>LruCache是Android 3.1所提供的一个缓存类，用于实现内存缓存。</p>
+<p>LruCache是个泛型类，主要算法原理是把最近使用的对象用强引用存储在 LinkedHashMap 中。每次访问一个值时，它都会被移动到队列的头部。当一个值被添加到一个满的缓存队列中时，该队列末尾的值将被清除，并有可能成为垃圾收集的对象。</p>
+<p>即当缓存满时，把最近最少使用的对象从内存中移除</p>
+<a id="more"></a>
+
+
+
+<h3 id="LruCache中的LinkedHashMap"><a href="#LruCache中的LinkedHashMap" class="headerlink" title="LruCache中的LinkedHashMap"></a>LruCache中的LinkedHashMap</h3><p>LruCache内部用LinkedHashMap保存值。HashMap和双向链表合二为一即是LinkedHashMap。由于LinkedHashMap是HashMap的子类，所以LinkedHashMap自然会拥有HashMap的所有特性。比如，LinkedHashMap的元素存取过程基本与HashMap基本类似，只是在细节实现上稍有不同。当然，这是由LinkedHashMap本身的特性所决定的，<strong>因为它额外维护了一个双向链表用于保持迭代顺序</strong>。此外，LinkedHashMap可以很好的支持LRU算法。(Least Recently Used，也就是最近最少使用算法)</p>
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/8/16/16c99be86bf3ba7c~tplv-t2oaga2asx-watermark.awebp" alt="LinkedHashMap结构"></p>
+<p>HashMap是无序的，也就是说，迭代HashMap所得到的元素顺序并不是它们最初放置到HashMap的顺序。HashMap的这一缺点往往会造成诸多不便，因为在有些场景中，我们确需要用到一个可以保持插入顺序的Map。庆幸的是，JDK为我们解决了这个问题，它为HashMap提供了一个子类 —— LinkedHashMap。虽然LinkedHashMap增加了时间和空间上的开销，但是它通过维护一个额外的双向链表保证了迭代顺序。特别地，该迭代顺序可以是插入顺序，也可以是访问顺序。因此，根据链表中元素的顺序可以将LinkedHashMap分为：保持插入顺序的LinkedHashMap 和 保持访问顺序的LinkedHashMap，其中LinkedHashMap的默认实现是按插入顺序排序的。</p>
+<h3 id="LruCache的构造函数"><a href="#LruCache的构造函数" class="headerlink" title="LruCache的构造函数"></a>LruCache的构造函数</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">LruCache</span><span class="params">(<span class="keyword">int</span> maxSize)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (maxSize &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;maxSize &lt;= 0&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.maxSize = maxSize;</span><br><span class="line">        <span class="keyword">this</span>.map = <span class="keyword">new</span> LinkedHashMap&lt;K, V&gt;(<span class="number">0</span>, <span class="number">0.75f</span>, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中就构造了一个LinkedHashMap</p>
+<blockquote>
+<p>LinkedHashMap&lt;K,V&gt;(int initialCapacity, float loadFactor, boolean accessOrder)</p>
+</blockquote>
+<ul>
+<li><p><code>InitialCapacity</code>该参数设定实现散列集的数组链表中数组的长度，默认大小为16之后每超过指定的大小都扩展为2的n次方倍</p>
+</li>
+<li><p><code>loadFactor</code> 默认为0.75f，注意是float类型的</p>
+</li>
+<li><p>当<code>accessOrder</code>为<strong>true</strong>的时候，在我们访问了一个Entry&lt;K,V&gt;时，我们会调用<code>afterNodeAccess()</code>方法，将我们当前访问的节点放入到链表的末尾，利用这个特性便可以区分谁是最近访问，谁是最近最不常访问元素了</p>
+</li>
+</ul>
+<p>  boolean removeEldestEntry(Map.Entry)该方法返回值为true时，会删除最近最不常使用的元素，也就是double-link的头部节点，当插入一个新节点之后<code>removeEldestEntry()</code>方法会被<code>put()、putAll()</code>方法调用，我们可以通过override该方法，来控制删除最旧节点的条件</p>
+<p>  <strong>LruCache中的maxSize，在没有重写sizeOf方法的时候，这是缓存项的最大数目和。</strong></p>
+<p>  以用户定义的单位返回条目的大小。默认实现返回1，因此size表项数，maxsize为最大表项数。</p>
+<p>  当条目在缓存中时，它的大小不能改变。</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">sizeOf</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>此缓存的size。不一定是元素的数量。默认情况下，缓存大小以条目数度量。覆盖</p>
+<p>sizeOf()方法以不同的单位调整缓存的大小</p>
+</blockquote>
+<p>  例如，这个缓存限制为4MiB的bitmaps:：</p>
+  <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> cacheSize = <span class="number">4</span> * <span class="number">1024</span> * <span class="number">1024</span>; <span class="comment">// 4MiB</span></span><br><span class="line">    LruCache&lt;String, Bitmap&gt; bitmapCache = <span class="keyword">new</span> LruCache&lt;String, Bitmap&gt;(cacheSize) &#123;</span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">sizeOf</span><span class="params">(String key, Bitmap value)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> value.getByteCount();<span class="comment">//返回字节数,也可根据需要自行重写</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="resize方法"><a href="#resize方法" class="headerlink" title="resize方法"></a>resize方法</h3><p>即重新定义maxSize</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">resize</span><span class="params">(<span class="keyword">int</span> maxSize)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (maxSize &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;maxSize &lt;= 0&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">          <span class="keyword">this</span>.maxSize = maxSize;</span><br><span class="line">      &#125;</span><br><span class="line">      trimToSize(maxSize);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="trimToSize方法"><a href="#trimToSize方法" class="headerlink" title="trimToSize方法"></a>trimToSize方法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">trimToSize</span><span class="params">(<span class="keyword">int</span> maxSize)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//循环删除最老的条目直到size小于maxSize</span></span><br><span class="line">       <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">           K key;</span><br><span class="line">           V value;</span><br><span class="line">           <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">               <span class="keyword">if</span> (size &lt; <span class="number">0</span> || (map.isEmpty() &amp;&amp; size != <span class="number">0</span>)) &#123;</span><br><span class="line">                   <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(getClass().getName()</span><br><span class="line">                           + <span class="string">&quot;.sizeOf() is reporting inconsistent results!&quot;</span>);</span><br><span class="line">               &#125;</span><br><span class="line"></span><br><span class="line">               <span class="keyword">if</span> (size &lt;= maxSize) &#123;</span><br><span class="line">                   <span class="keyword">break</span>;</span><br><span class="line">               &#125;</span><br><span class="line"></span><br><span class="line">               Map.Entry&lt;K, V&gt; toEvict = map.eldest();</span><br><span class="line">               <span class="keyword">if</span> (toEvict == <span class="keyword">null</span>) &#123;</span><br><span class="line">                   <span class="keyword">break</span>;</span><br><span class="line">               &#125;</span><br><span class="line"></span><br><span class="line">               key = toEvict.getKey();</span><br><span class="line">               value = toEvict.getValue();</span><br><span class="line">               map.remove(key);</span><br><span class="line">               size -= safeSizeOf(key, value);</span><br><span class="line">               evictionCount++;</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           entryRemoved(<span class="keyword">true</span>, key, value, <span class="keyword">null</span>);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Map.Entry是Map声明的一个内部接口，此接口为泛型，定义为Entry&lt;K,V&gt;。它表示Map中的一个实体（一个key-value对）。接口中有getKey(),getValue等方法</p>
+</blockquote>
+<p>safeSizeOf本质还是调用sizeOf</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">safeSizeOf</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">int</span> result = sizeOf(key, value);</span><br><span class="line">      <span class="keyword">if</span> (result &lt; <span class="number">0</span>) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Negative size: &quot;</span> + key + <span class="string">&quot;=&quot;</span> + value);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> result;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>protected void entryRemoved(boolean evicted, K key, V oldValue, V newValue) {}</p>
+</blockquote>
+<p>这个方法是当一个值被回收以腾出空间（如trimToSize方法）或调用put、remove时被调用。如果缓存值中包含需要显式释放的资源，可以重写entryRemoved（）方法，在其中完成资源的回收工作。</p>
+<p>参数含义：</p>
+<p><em>evicted</em>：如果要删除条目以腾出空间，则为true；如果删除是由put（）、get（）或remove（）引起的，则为false。</p>
+<p><em>newValue</em>：如果它存在的话且非null，则由put或get导致删除。如果为null，它是由回收或remove引起的。</p>
+<h3 id="get方法"><a href="#get方法" class="headerlink" title="get方法"></a>get方法</h3><p>返回key对应的值（如果它存在于缓存中或可以由create（）方法创建）。如果返回了一个值，它将移动到队列的头部。如果值未缓存且无法创建，则返回null</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">get</span><span class="params">(K key)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (key == <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">&quot;key == null&quot;</span>);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       V mapValue;</span><br><span class="line">       <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">           mapValue = map.get(key);</span><br><span class="line">           <span class="keyword">if</span> (mapValue != <span class="keyword">null</span>) &#123;</span><br><span class="line">               hitCount++;</span><br><span class="line">               <span class="keyword">return</span> mapValue;</span><br><span class="line">           &#125;</span><br><span class="line">           missCount++;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        * Attempt to create a value. This may take a long time, and the map</span></span><br><span class="line"><span class="comment">        * may be different when create() returns. If a conflicting value was</span></span><br><span class="line"><span class="comment">        * added to the map while create() was working, we leave that value in</span></span><br><span class="line"><span class="comment">        * the map and release the created value.</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">	<span class="comment">/*试图创造值。这可能需要很长时间，并且当create（）返回时map可能不同。如果在create（）工		作时向映射添加了一个冲突的值，则将该值保留在map并释放所创建的值。*/</span></span><br><span class="line">    </span><br><span class="line">       V createdValue = create(key);</span><br><span class="line">       <span class="keyword">if</span> (createdValue == <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">           createCount++;</span><br><span class="line">           mapValue = map.put(key, createdValue);</span><br><span class="line"></span><br><span class="line">           <span class="keyword">if</span> (mapValue != <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="comment">// There was a conflict so undo that last put</span></span><br><span class="line">               map.put(key, mapValue);</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               size += safeSizeOf(key, createdValue);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> (mapValue != <span class="keyword">null</span>) &#123;</span><br><span class="line">           entryRemoved(<span class="keyword">false</span>, key, createdValue, mapValue);</span><br><span class="line">           <span class="keyword">return</span> mapValue;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           trimToSize(maxSize);</span><br><span class="line">           <span class="keyword">return</span> createdValue;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="create方法"><a href="#create方法" class="headerlink" title="create方法"></a>create方法</h4><p>如果无法根据某个key得到值，可以用create方法根据key得到指定值，create方法默认返回null，可以自行override</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> V <span class="title">create</span><span class="params">(K key)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="附：LinkedHashMap实现LRU"><a href="#附：LinkedHashMap实现LRU" class="headerlink" title="附：LinkedHashMap实现LRU"></a>附：LinkedHashMap实现LRU</h2><blockquote>
+<p>实现LRU的关键在于对访问的节点按使用时间进行排序</p>
+</blockquote>
+<h3 id="afterNodeAccess"><a href="#afterNodeAccess" class="headerlink" title="afterNodeAccess"></a>afterNodeAccess</h3><p>在LinkedHashMap中的节点被访问后，会调用afterNodeAccess方法。这个方法会将该节点移动到LinkedHashMap中维护的双向链表的尾部，即该双向链表的尾部即为最近访问的节点。</p>
+<p>这个方法会在get或put等对节点访问的时候调用。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">afterNodeAccess</span><span class="params">(Node&lt;K,V&gt; e)</span> </span>&#123; <span class="comment">// move node to last</span></span><br><span class="line">    LinkedHashMapEntry&lt;K,V&gt; last;</span><br><span class="line">    <span class="keyword">if</span> (accessOrder &amp;&amp; (last = tail) != e) &#123;</span><br><span class="line">        LinkedHashMapEntry&lt;K,V&gt; p =</span><br><span class="line">            (LinkedHashMapEntry&lt;K,V&gt;)e, b = p.before, a = p.after;</span><br><span class="line">        p.after = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (b == <span class="keyword">null</span>)</span><br><span class="line">            head = a;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            b.after = a;</span><br><span class="line">        <span class="keyword">if</span> (a != <span class="keyword">null</span>)</span><br><span class="line">            a.before = b;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            last = b;</span><br><span class="line">        <span class="keyword">if</span> (last == <span class="keyword">null</span>)</span><br><span class="line">            head = p;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            p.before = last;</span><br><span class="line">            last.after = p;</span><br><span class="line">        &#125;</span><br><span class="line">        tail = p;</span><br><span class="line">        ++modCount;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="afterNodeInsertion"><a href="#afterNodeInsertion" class="headerlink" title="afterNodeInsertion"></a>afterNodeInsertion</h3><p>在LinkedHashMap中插入节点后，会调用afterNodeAccess方法。</p>
+<p>这个方法主要在put方法后调用，put的具体实现继承自HashMap。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">afterNodeInsertion</span><span class="params">(<span class="keyword">boolean</span> evict)</span> </span>&#123; <span class="comment">// possibly remove eldest</span></span><br><span class="line">    LinkedHashMapEntry&lt;K,V&gt; first;</span><br><span class="line">    <span class="keyword">if</span> (evict &amp;&amp; (first = head) != <span class="keyword">null</span> &amp;&amp; removeEldestEntry(first)) &#123;</span><br><span class="line">        K key = first.key;</span><br><span class="line">        removeNode(hash(key), key, <span class="keyword">null</span>, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="removeEldestEntry"><a href="#removeEldestEntry" class="headerlink" title="removeEldestEntry"></a>removeEldestEntry</h4><p>该方法参与决定了是否移除最近最少使用的节点，默认返回false，表示不移除。</p>
+<p>在需要的时候对这个方法进行重写，定义何时返回true表示删除最近最少使用的节点。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;K,V&gt; eldest)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
   </entry>
 </search>
